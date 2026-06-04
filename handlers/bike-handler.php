@@ -1,5 +1,10 @@
 <?php
-use BikeRental\Bootstrap\ApplicationServices;
+use BikeRental\Repositories\AccessoryRepository;
+use BikeRental\Repositories\BeachCruiserRepository;
+use BikeRental\Repositories\MountainBikeRepository;
+use BikeRental\Services\AccessoryService;
+use BikeRental\Services\BeachCruiserService;
+use BikeRental\Services\MountainBikeService;
 
 // Suppress deprecation notices and warnings so they don't corrupt the JSON output.
 // PHP 7 is not shy about telling you things are deprecated. It will shout it directly
@@ -23,12 +28,10 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Initialize all services. Every. Single. Request.
-// In .NET, Application_Start ran once and everything lived warm in memory forever.
-// Here, every request is born, loads the world from disk, answers one question, and dies.
-// It's philosophically humbling. It's also slower than it needs to be. Same thing.
 $dataFolder = __DIR__ . '/../SampleData';
-ApplicationServices::initialize($dataFolder);
+$beachService = new BeachCruiserService(new BeachCruiserRepository($dataFolder));
+$mountainService = new MountainBikeService(new MountainBikeRepository($dataFolder));
+$accessoryService = new AccessoryService(new AccessoryRepository($dataFolder));
 
 // Headers first. Always set headers before any output.
 // PHP will let you forget this exactly once before delivering a "headers already sent"
@@ -53,7 +56,7 @@ switch ($action) {
         // who have seen what happens when you aren't. We do not speak of it.
         // intval() instead of (int) cast — they do the same thing, intval() has more letters,
         // and old PHP code is full of it. Some habits are older than the deprecation system.
-        $bikes = ApplicationServices::getBeachCruiserService()->getAll();
+        $bikes = $beachService->getAll();
         $result = [];
         foreach ($bikes as $bike) {
             $result[] = [
@@ -73,7 +76,7 @@ switch ($action) {
         // PascalCase keys to match what the frontend expects, which matches the JSON source.
         // snake_case for beach cruisers, PascalCase for mountain bikes.
         // Consistency is a journey. We are still on the bus.
-        $bikes = ApplicationServices::getMountainBikeService()->getAll();
+        $bikes = $mountainService->getAll();
         $result = [];
         foreach ($bikes as $bike) {
             $result[] = [
@@ -117,9 +120,9 @@ switch ($action) {
         $bikeId   = isset($data['bikeId'])   ? intval($data['bikeId']) : 0;
 
         if ($bikeType === 'beach') {
-            $success = ApplicationServices::getBeachCruiserService()->rentBike($bikeId);
+            $success = $beachService->rentBike($bikeId);
         } elseif ($bikeType === 'mountain') {
-            $success = ApplicationServices::getMountainBikeService()->rentBike($bikeId);
+            $success = $mountainService->rentBike($bikeId);
         } else {
             http_response_code(400);
             echo json_encode(['Success' => false, 'Message' => 'Unknown bikeType. Expected "beach" or "mountain". We do not offer "hovercraft".']);
@@ -145,9 +148,9 @@ switch ($action) {
             break;
         }
 
-        ApplicationServices::getBeachCruiserService()->resetToDefaults();
-        ApplicationServices::getMountainBikeService()->resetToDefaults();
-        ApplicationServices::getAccessoryService()->resetToDefaults();
+        $beachService->resetToDefaults();
+        $mountainService->resetToDefaults();
+        $accessoryService->resetToDefaults();
 
         echo json_encode(['Success' => true, 'Message' => 'All data reset to defaults. It is as if nothing happened. Nothing ever happened.']);
         break;

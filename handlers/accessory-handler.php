@@ -1,5 +1,6 @@
 <?php
-use BikeRental\Bootstrap\ApplicationServices;
+use BikeRental\Repositories\AccessoryRepository;
+use BikeRental\Services\AccessoryService;
 
 // Same error_reporting suppression as bike-handler.php.
 // PHP 7 will complain about loudly if you let it.
@@ -21,7 +22,7 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $dataFolder = __DIR__ . '/../SampleData';
-ApplicationServices::initialize($dataFolder);
+$accessoryService = new AccessoryService(new AccessoryRepository($dataFolder));
 
 header('Content-Type: application/json');
 header('Cache-Control: no-cache, no-store, must-revalidate');
@@ -33,7 +34,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     // Return accessories, optionally filtered by bikeType.
     // it finds distasteful. We've asked it to keep its opinions to itself (see top of file).
-    $accessoryService = ApplicationServices::getAccessoryService();
 
     if (isset($_GET['bikeType']) && $_GET['bikeType'] !== '') {
         $accessories = $accessoryService->getCompatibleWith($_GET['bikeType']);
@@ -78,7 +78,7 @@ if ($method === 'GET') {
         exit;
     }
 
-    $result = ApplicationServices::getAccessoryService()->processOrder($data);
+    $result = $accessoryService->processOrder($data);
     echo json_encode($result);
 
 } else {
