@@ -267,3 +267,28 @@ Highest-risk debt:
 - No tests around rental, ordering, stock deduction, or cache behavior.
 
 For enterprise integration, the first stabilization pass should replace deprecated PHP features, introduce interfaces for repositories/services, move response DTO shaping out of handlers, normalize data models, and replace file persistence with a transactional datastore.
+
+## 11. Recommended Modernization Scope
+
+The objective is to modernize the module while preserving existing business behavior and functionality.
+
+### Planned Improvements
+
+- Introduce Composer autoloading
+- Implement PSR-4 namespaces
+- Replace Service Locator with Dependency Injection
+- Introduce Controller layer
+- Add request validation
+- Add centralized error handling
+- Ensure PHP 8.3 compatibility
+- Improve frontend UX and responsiveness
+- Improve code organization and maintainability
+- Add documentation and basic test coverage
+
+### Out of Scope
+
+- Full Laravel migration
+- Complete framework rewrite
+- Database migration
+- Major feature additions
+- Business logic redesign
