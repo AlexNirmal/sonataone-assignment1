@@ -1,0 +1,410 @@
+/* PedalPal Shared Application Styles
+ * Common CSS used across all bike rental pages
+ * Page-specific colors and gradients remain in individual HTML files
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    padding: 30px 20px;
+}
+
+/* Header Styles */
+.page-header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Navigation */
+.back-link {
+    display: inline-block;
+    color: white;
+    text-decoration: none;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+}
+
+.back-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+/* Grid Container */
+.bikes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Bike Card */
+.bike-card {
+    background: white;
+    border-radius: 14px;
+    padding: 28px;
+    width: 300px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+}
+
+.bike-card:hover {
+    transform: translateY(-4px);
+}
+
+.bike-card h3 {
+    font-size: 1.3rem;
+    color: #222;
+    margin-bottom: 14px;
+}
+
+.bike-brand {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 14px;
+}
+
+/* Bike Details */
+.bike-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.bike-detail .label {
+    color: #888;
+}
+
+.bike-detail .value {
+    color: #333;
+    font-weight: 500;
+}
+
+.bike-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 14px 0;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.status-available {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-rented {
+    background: #fce4ec;
+    color: #c62828;
+}
+
+/* Buttons */
+.rent-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    color: white;
+}
+
+.rent-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.rent-btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.rent-btn:disabled {
+    background: #e0e0e0;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+/* Loading and Error States */
+.loading-msg {
+    text-align: center;
+    color: white;
+    font-size: 1.2rem;
+    padding: 60px;
+}
+
+.error-msg {
+    text-align: center;
+    background: rgba(255,255,255,0.9);
+    color: #c62828;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
+    margin: 40px auto;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 32px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    position: relative;
+}
+
+.modal h2 {
+    font-size: 1.6rem;
+    color: #222;
+    margin-bottom: 6px;
+}
+
+.modal .modal-subtitle {
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 24px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+/* Accessory Items */
+.accessory-item {
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.accessory-info {
+    flex: 1;
+}
+
+.accessory-info h4 {
+    font-size: 1rem;
+    color: #222;
+    margin-bottom: 4px;
+}
+
+.accessory-info .acc-desc {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.accessory-info .acc-meta {
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+.accessory-price {
+    font-weight: 700;
+    font-size: 1.05rem;
+    white-space: nowrap;
+}
+
+/* Quantity Controls */
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s;
+    border: 2px solid;
+}
+
+.qty-btn:hover {
+    background-color: currentColor;
+    color: white;
+}
+
+.qty-display {
+    min-width: 28px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Bundle Banner */
+.bundle-banner {
+    background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+    border: 1px solid #e0b050;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #5a3e00;
+    display: none;
+}
+
+.bundle-banner.active {
+    display: block;
+}
+
+/* Total Section */
+.total-section {
+    border-top: 2px solid #f0f0f0;
+    padding-top: 18px;
+    margin-top: 6px;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.total-line.grand-total {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #222;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+}
+
+.discount-line {
+    color: #2e7d32;
+}
+
+/* Action Buttons */
+.confirm-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.confirm-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.confirm-btn:disabled {
+    background: #e0e0e0;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+.skip-btn {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    color: #888;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.skip-btn:hover {
+    border-color: #bbb;
+    color: #555;
+}
+
+/* Success Message */
+.success-msg {
+    text-align: center;
+    padding: 20px;
+}
+
+.success-msg .success-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.success-msg h3 {
+    font-size: 1.4rem;
+    color: #2e7d32;
+    margin-bottom: 8px;
+}
+
+.success-msg p {
+    color: #555;
+    font-size: 0.95rem;
+}
