@@ -1,10 +1,12 @@
 <?php
-require_once __DIR__ . '/../data/BeachCruiserRepository.php';
-require_once __DIR__ . '/../data/MountainBikeRepository.php';
-require_once __DIR__ . '/../data/AccessoryRepository.php';
-require_once __DIR__ . '/BeachCruiserService.php';
-require_once __DIR__ . '/MountainBikeService.php';
-require_once __DIR__ . '/AccessoryService.php';
+namespace BikeRental\Bootstrap;
+
+use BikeRental\Repositories\AccessoryRepository;
+use BikeRental\Repositories\BeachCruiserRepository;
+use BikeRental\Repositories\MountainBikeRepository;
+use BikeRental\Services\AccessoryService;
+use BikeRental\Services\BeachCruiserService;
+use BikeRental\Services\MountainBikeService;
 
 /**
  * ApplicationServices

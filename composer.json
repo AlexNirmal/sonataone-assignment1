@@ -1,0 +1,14 @@
+{
+  "name": "pedalpal/bike-rental-web",
+  "description": "Legacy PHP bike rental module modernized with Composer autoloading.",
+  "type": "project",
+  "license": "ISC",
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "BikeRental\\": "src/"
+    }
+  }
+}

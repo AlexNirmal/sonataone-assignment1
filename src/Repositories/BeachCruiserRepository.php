@@ -1,4 +1,6 @@
 <?php
+namespace BikeRental\Repositories;
+
 /**
  * BeachCruiserRepository
  *
@@ -101,20 +103,13 @@ class BeachCruiserRepository {
     /**
      * Write bikes back to XML.
      *
-     * Uses each() to iterate over the array with the internal array pointer.
-     * each() was already old when most PHP developers learned to code.
-     * foreach() has been the right answer since PHP 4. We use each() anyway.
-     * You will notice this when you run it on PHP 8, because each() will be gone
      * and replaced by a very clear error message. Consider this foreshadowing.
-     * reset() is called first because each() will start wherever the pointer is,
      * and if something moved it, we'd skip bikes. We reset. We iterate. We persist.
      */
     private function writeToXml($bikes) {
-        $xml = new SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><BeachCruisers/>');
+        $xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><BeachCruisers/>');
 
-        reset($bikes); // Reset internal array pointer. each() needs this. foreach() would not.
-        while ($entry = each($bikes)) { // each() — been deprecated since 7.2, gone in 8.0. A ghost that still works here.
-            $bike = $entry['value'];
+        foreach ($bikes as $bike) {
             $bikeNode = $xml->addChild('Bike');
             $bikeNode->addChild('bike_id',      $bike['bike_id']);
             $bikeNode->addChild('model_name',   htmlspecialchars($bike['model_name']));

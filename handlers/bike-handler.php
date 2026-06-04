@@ -1,4 +1,6 @@
 <?php
+use BikeRental\Bootstrap\ApplicationServices;
+
 // Suppress deprecation notices and warnings so they don't corrupt the JSON output.
 // PHP 7 is not shy about telling you things are deprecated. It will shout it directly
 // into your response body, ruining the JSON and your afternoon simultaneously.
@@ -19,16 +21,7 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
  * No pipeline. No handlers. No modules. Just vibes and file_get_contents.
  */
 
-// require_once: because nothing says "enterprise PHP" like manually listing every file
-// you need at the top. No autoloading. No composer (well, not yet). Just you and your
-// directory structure and a quiet optimism that nothing is circular.
-require_once __DIR__ . '/../data/BeachCruiserRepository.php';
-require_once __DIR__ . '/../data/MountainBikeRepository.php';
-require_once __DIR__ . '/../data/AccessoryRepository.php';
-require_once __DIR__ . '/../services/BeachCruiserService.php';
-require_once __DIR__ . '/../services/MountainBikeService.php';
-require_once __DIR__ . '/../services/AccessoryService.php';
-require_once __DIR__ . '/../services/ApplicationServices.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Initialize all services. Every. Single. Request.
 // In .NET, Application_Start ran once and everything lived warm in memory forever.

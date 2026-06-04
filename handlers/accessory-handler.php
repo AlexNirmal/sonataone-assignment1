@@ -1,6 +1,7 @@
 <?php
+use BikeRental\Bootstrap\ApplicationServices;
+
 // Same error_reporting suppression as bike-handler.php.
-// AccessoryService uses create_function() and FILTER_SANITIZE_STRING, both of which
 // PHP 7 will complain about loudly if you let it.
 // We do not let it. Silence, deprecated functions. You still work. That's enough.
 error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
@@ -17,13 +18,7 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
  * Same outcome. Fewer annotations. More character.
  */
 
-require_once __DIR__ . '/../data/BeachCruiserRepository.php';
-require_once __DIR__ . '/../data/MountainBikeRepository.php';
-require_once __DIR__ . '/../data/AccessoryRepository.php';
-require_once __DIR__ . '/../services/BeachCruiserService.php';
-require_once __DIR__ . '/../services/MountainBikeService.php';
-require_once __DIR__ . '/../services/AccessoryService.php';
-require_once __DIR__ . '/../services/ApplicationServices.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $dataFolder = __DIR__ . '/../SampleData';
 ApplicationServices::initialize($dataFolder);
@@ -37,7 +32,6 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
     // Return accessories, optionally filtered by bikeType.
-    // getCompatibleWith() uses create_function() internally, which PHP would like you to know
     // it finds distasteful. We've asked it to keep its opinions to itself (see top of file).
     $accessoryService = ApplicationServices::getAccessoryService();
 

@@ -1,4 +1,8 @@
 <?php
+namespace BikeRental\Services;
+
+use BikeRental\Repositories\MountainBikeRepository;
+
 /**
  * MountainBikeService
  *

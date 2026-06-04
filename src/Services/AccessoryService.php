@@ -1,4 +1,8 @@
 <?php
+namespace BikeRental\Services;
+
+use BikeRental\Repositories\AccessoryRepository;
+
 /**
  * AccessoryService
  *
@@ -34,36 +38,26 @@ class AccessoryService {
     /**
      * Get accessories compatible with a given bike type.
      *
-     * First sanitizes $bikeType using FILTER_SANITIZE_STRING.
-     * FILTER_SANITIZE_STRING strips HTML tags and encodes special characters.
-     * It has been called "surprising" in the PHP docs, which is a very polite way
-     * of saying "it does things you wouldn't expect." It works in PHP 7.
-     * Check the changelog before running this on PHP 8.1+. You'll have a surprise of your own.
+     * First strips HTML tags from $bikeType.
      *
-     * Then filters using create_function().
-     * create_function() builds a PHP string and evals it. It is literally eval() in a trench coat.
      * A proper anonymous function (function($x) use ($y) {}) has existed since PHP 5.3.
-     * We are on PHP 7. We are using create_function() anyway.
      * It still works here. It will not work everywhere. You'll know when you find the edge.
      *
      * @param string $bikeType 'beach' or 'mountain'
      * @return array
      */
     public function getCompatibleWith($bikeType) {
-        $bikeType = filter_var($bikeType, FILTER_SANITIZE_STRING); // FILTER_SANITIZE_STRING: works in PHP 7, less so later
+        $bikeType = strip_tags((string)$bikeType);
         $bikeType = strtolower(trim($bikeType));
 
         $accessories = $this->repo->getAll();
 
-        // create_function(): eval in a trench coat. Been deprecated since PHP 7.2.
         // The $bikeType variable is interpolated into the string body because
-        // create_function() has no 'use' clause — it's not a closure, it's a string that runs.
         // addslashes() is here to keep $bikeType from accidentally becoming PHP code.
         // "Accidentally becoming PHP code" is the kind of sentence that should give you pause.
-        $filterFn = create_function(
-            '$accessory',
-            'return in_array("' . addslashes($bikeType) . '", $accessory["CompatibleWith"]) || in_array("all", $accessory["CompatibleWith"]);'
-        );
+        $filterFn = function ($accessory) use ($bikeType) {
+            return in_array($bikeType, $accessory['CompatibleWith']) || in_array('all', $accessory['CompatibleWith']);
+        };
 
         return array_values(array_filter($accessories, $filterFn));
     }
