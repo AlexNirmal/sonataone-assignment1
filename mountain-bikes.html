@@ -58,16 +58,19 @@
     <p>More gears than you'll use. More suspension than you need. Exactly the right amount of fun.</p>
 </div>
 
+<div id="pageAlert" class="page-alert" role="status" aria-live="polite" aria-atomic="true"></div>
+
 <div id="bikesContainer" class="bikes-grid">
     <div class="loading-msg">Loading bikes...</div>
 </div>
 
 <!-- Accessory Modal -->
-<div class="modal-overlay" id="accessoryModal">
+<div class="modal-overlay" id="accessoryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalSubtitle" tabindex="-1">
     <div class="modal">
-        <button class="modal-close" id="modalClose">&times;</button>
-        <h2>Add Accessories</h2>
+        <button class="modal-close" id="modalClose" aria-label="Close accessory dialog">&times;</button>
+        <h2 id="modalTitle">Add Accessories</h2>
         <p class="modal-subtitle" id="modalSubtitle">Loading accessories...</p>
+        <div id="modalErrorMsg" class="error-msg" role="alert" aria-live="assertive" style="display:none"></div>
 
         <div class="bundle-banner" id="bundleBanner">
             🎉 <strong>Bundle Deal!</strong> Water Bottle + Bike Light = 10% off your entire order.
@@ -90,8 +93,8 @@
             </div>
         </div>
 
-        <button class="confirm-btn" id="confirmOrderBtn" disabled>Confirm Order</button>
-        <button class="skip-btn" id="skipAccessoriesBtn">No thanks, just the bike</button>
+        <button class="confirm-btn" id="confirmOrderBtn" disabled aria-label="Confirm accessory order">Confirm Order</button>
+        <button class="skip-btn" id="skipAccessoriesBtn" aria-label="Skip accessories and finalize bike rental">No thanks, just the bike</button>
 
         <div class="success-msg" id="orderSuccessMsg" style="display:none">
             <div class="success-icon">🎉</div>

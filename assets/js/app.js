@@ -10,6 +10,74 @@ var BikeRental = (function() {
     var config = null;
     var currentBikeId = null;
     var accessories = [];
+    var lastActiveElement = null;
+    var orderJustSubmitted = false;  // Track if we should suppress rental confirmation toast
+
+    function ensureToastContainer() {
+        if ($('#toastContainer').length === 0) {
+            $('body').append(
+                '<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>'
+            );
+        }
+    }
+
+    function showToast(message, type) {
+        ensureToastContainer();
+        var toastClass = 'toast';
+        if (type === 'error') {
+            toastClass += ' toast-error';
+        } else if (type === 'success') {
+            toastClass += ' toast-success';
+        } else {
+            toastClass += ' toast-info';
+        }
+
+        var $toast = $('<div>')
+            .addClass(toastClass)
+            .attr('role', 'status')
+            .attr('aria-live', 'polite')
+            .text(message);
+
+        $('#toastContainer').append($toast);
+
+        setTimeout(function() {
+            $toast.addClass('show');
+        }, 10);
+
+        setTimeout(function() {
+            $toast.removeClass('show');
+            setTimeout(function() {
+                $toast.remove();
+            }, 300);
+        }, 3800);
+    }
+
+    function setPageAlert(message, type) {
+        var $alert = $('#pageAlert');
+        if ($alert.length === 0) {
+            return;
+        }
+        if (!message) {
+            $alert.hide().text('').removeClass('alert-error alert-info');
+            return;
+        }
+        $alert.removeClass('alert-error alert-info')
+            .addClass(type === 'error' ? 'alert-error' : 'alert-info')
+            .text(message)
+            .show();
+    }
+
+    function showModalError(message) {
+        var $error = $('#modalErrorMsg');
+        if ($error.length === 0) {
+            return;
+        }
+        $error.text(message).show();
+    }
+
+    function clearModalError() {
+        $('#modalErrorMsg').hide().text('');
+    }
 
     // Public API
     return {
@@ -59,6 +127,14 @@ var BikeRental = (function() {
                 }
             });
 
+            // Keyboard close support
+            $(document).on('keydown', function(e) {
+                if (e.which === 27 && $('#accessoryModal').hasClass('active')) {
+                    BikeRental.closeModal();
+                    BikeRental.refreshBikes();
+                }
+            });
+
             // Load bikes on init
             BikeRental.loadBikes();
         },
@@ -67,6 +143,12 @@ var BikeRental = (function() {
          * Load bikes from the API
          */
         loadBikes: function() {
+            setPageAlert('');
+            $('#bikesContainer').html(
+                '<div class="loading-msg" role="status" aria-live="polite">' +
+                '<span class="spinner" aria-hidden="true"></span> Loading bikes...</div>'
+            );
+
             $.ajax({
                 url: config.bikeHandlerUrl + '?action=' + config.bikeType,
                 method: 'GET',
@@ -77,10 +159,12 @@ var BikeRental = (function() {
                     }
                 },
                 error: function() {
+                    var message = 'Failed to load bikes. The PHP server may not be running.';
                     $('#bikesContainer').html(
-                        '<div class="error-msg">Failed to load bikes. ' +
-                        'The PHP server may not be running. Try: npm start</div>'
+                        '<div class="error-msg" role="alert">' + message + '</div>'
                     );
+                    setPageAlert(message, 'error');
+                    showToast(message, 'error');
                 }
             });
         },
@@ -108,12 +192,16 @@ var BikeRental = (function() {
                         BikeRental.openAccessoryModal(bikeId);
                         BikeRental.refreshBikes(); // refresh in background
                     } else {
-                        alert('Could not rent bike: ' + response.Message);
+                        var message = 'Could not rent bike: ' + response.Message;
+                        setPageAlert(message, 'error');
+                        showToast(message, 'error');
                         BikeRental.refreshBikes();
                     }
                 },
                 error: function() {
-                    alert('Failed to rent bike. Check that the PHP server is running.');
+                    var message = 'Failed to rent bike. Check that the PHP server is running.';
+                    setPageAlert(message, 'error');
+                    showToast(message, 'error');
                 }
             });
         },
@@ -122,11 +210,16 @@ var BikeRental = (function() {
          * Open the accessory modal for a rented bike
          */
         openAccessoryModal: function(bikeId) {
+            lastActiveElement = document.activeElement;
             currentBikeId = bikeId;
+
+            clearModalError();
+            setPageAlert('');
 
             // Reset modal state
             $('#accessoryList').html(
-                '<p style="color:#888;text-align:center;padding:20px;">Loading accessories...</p>'
+                '<div class="loading-msg" role="status" aria-live="polite">' +
+                '<span class="spinner" aria-hidden="true"></span> Loading accessories...</div>'
             );
             $('#modalSubtitle').text('Rented! Would you like to add anything?');
             $('#bundleBanner').removeClass('active');
@@ -135,10 +228,11 @@ var BikeRental = (function() {
             $('#totalVal').text('$0.00');
             $('#confirmOrderBtn').prop('disabled', true);
             $('#orderSuccessMsg').hide();
-            $('#confirmOrderBtn').show();
+            $('#confirmOrderBtn').show().text('Confirm Order');
             $('#skipAccessoriesBtn').show();
-
+            $('#accessoryModal .modal').attr('aria-busy', 'true');
             $('#accessoryModal').addClass('active');
+            $('#modalClose').focus();
 
             // Fetch accessories for this bike type
             $.ajax({
@@ -154,11 +248,16 @@ var BikeRental = (function() {
                     if (config.onAccessoriesRender) {
                         config.onAccessoriesRender(accessories);
                     }
+                    $('#accessoryModal .modal').removeAttr('aria-busy');
                 },
                 error: function() {
+                    var message = 'Failed to load accessories.';
                     $('#accessoryList').html(
-                        '<p style="color:#c62828;text-align:center;">Failed to load accessories.</p>'
+                        '<div class="error-msg" role="alert">' + message + '</div>'
                     );
+                    showModalError(message);
+                    showToast(message, 'error');
+                    $('#accessoryModal .modal').removeAttr('aria-busy');
                 }
             });
         },
@@ -167,13 +266,29 @@ var BikeRental = (function() {
          * Close the accessory modal and reset state
          */
         closeModal: function() {
+            var wasOrderJustSubmitted = orderJustSubmitted;
+            var hadBikeId = currentBikeId !== null;
+            
             $('#accessoryModal').removeClass('active');
+            $('#accessoryModal .modal').removeAttr('aria-busy');
             $('#accessoryList').show();
             $('#confirmOrderBtn').show().text('Confirm Order');
             $('#skipAccessoriesBtn').show();
             $('#orderSuccessMsg').hide();
+            clearModalError();
             currentBikeId = null;
             accessories = [];
+            orderJustSubmitted = false;  // Reset flag
+            
+            if (lastActiveElement && $(lastActiveElement).length) {
+                $(lastActiveElement).focus();
+            }
+            lastActiveElement = null;
+            
+            // Show rental confirmation toast only if we didn't just submit an order
+            if (!wasOrderJustSubmitted && hadBikeId) {
+                showToast('Bike rental confirmed.', 'success');
+            }
         },
 
         /**
@@ -271,6 +386,7 @@ var BikeRental = (function() {
                 dataType: 'json',
                 success: function(response) {
                     if (response.Success) {
+                        orderJustSubmitted = true;  // Mark that we should not show rental toast
                         var detail = response.Message;
                         if (response.BundleDiscountApplied) {
                             detail += ' Total: $' + response.TotalPrice.toFixed(2) +
@@ -290,12 +406,16 @@ var BikeRental = (function() {
                             BikeRental.closeModal();
                         }, 3500);
                     } else {
-                        alert('Order failed: ' + response.Message);
+                        var message = 'Order failed: ' + response.Message;
+                        showModalError(message);
+                        showToast(message, 'error');
                         $('#confirmOrderBtn').prop('disabled', false).text('Confirm Order');
                     }
                 },
                 error: function() {
-                    alert('Failed to submit order.');
+                    var message = 'Failed to submit order.';
+                    showModalError(message);
+                    showToast(message, 'error');
                     $('#confirmOrderBtn').prop('disabled', false).text('Confirm Order');
                 }
             });
